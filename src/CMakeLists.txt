@@ -5,3 +5,4 @@ file(GLOB_RECURSE HEADERS *.h)
 
 add_executable(psemu ${SOURCES} ${HEADERS})
 set_property(TARGET psemu PROPERTY CXX_STANDARD 11)
+set_target_properties(psemu PROPERTIES FOLDER "PSemu")

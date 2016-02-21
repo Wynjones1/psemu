@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
-find_package(GTest REQUIRED)
+include(functions)
+setup_local_gtest()
 
 file(GLOB_RECURSE TESTS *.cpp)
 
@@ -11,4 +12,5 @@ foreach(TEST ${TESTS})
         ${NAME}
         PUBLIC ${GTEST_INCLUDE_DIRS})
     add_test(NAME ${NAME} COMMAND ${NAME})
+	set_target_properties(${NAME} PROPERTIES FOLDER "Tests")
 endforeach()

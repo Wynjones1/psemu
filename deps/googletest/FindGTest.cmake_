@@ -1,0 +1,4 @@
+set(GTEST_FOUND True)
+set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/googletest/include)
+set(GTEST_LIBRARY gtest)
+set(GTEST_MAIN_LIBRARY gtest_main)
