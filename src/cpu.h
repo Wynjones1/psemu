@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include "encoding.h"
 
-
 class CPU
 {
 public:
