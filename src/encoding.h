@@ -20,10 +20,10 @@ public:
 
     explicit operator uint32_t() { return value; }
 
-    inline uint8_t op() { return extract(value, 31, 26);}
-    inline uint8_t rs() { return extract(value, 25, 21);}
-    inline uint8_t rt() { return extract(value, 20, 16);}
-    inline uint8_t imm(){ return extract(value, 15,  0);}
+    inline uint8_t  op() { return extract(value, 31, 26);}
+    inline uint8_t  rs() { return extract(value, 25, 21);}
+    inline uint8_t  rt() { return extract(value, 20, 16);}
+    inline uint16_t imm(){ return extract(value, 15,  0);}
     uint32_t value;
 };
 

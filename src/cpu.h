@@ -7,11 +7,16 @@
 class CPU
 {
 public:
+    void FetchInstruction(void);
+    void DecodeInstruction(void);
+    void ExecuteALU(void);
+    void AccessMemory(void);
+    void Writeback(void);
+public:
     uint32_t registers[32];
     uint32_t pc;
-    // Mul / Div result
-    uint32_t lo;
     uint32_t hi;
+    uint32_t lo;
 };
 
 #endif
