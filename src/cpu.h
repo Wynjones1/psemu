@@ -1,6 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 #include <stdint.h>
+#include "encoding.h"
 
 class Memory;
 
@@ -75,7 +76,6 @@ public:
 	// Jump Instructions (J-Type).
 	void J(void);
 	void JAL(void);
-	void JR(void);
 	void JR(void);
 	void JALR(void);
 

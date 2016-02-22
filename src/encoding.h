@@ -7,9 +7,10 @@ constexpr uint32_t mask(uint32_t msb, uint32_t lsb)
     return (((1 << msb) - 1) >> lsb) << lsb;
 }
 
-constexpr uint32_t extract(uint32_t value, uint32_t msb, uint32_t lsb)
+template<typename T = uint32_t>
+constexpr T extract(uint32_t value, uint32_t msb, uint32_t lsb)
 {
-    return (value & mask(msb, lsb)) >> lsb;
+	return T((value & mask(msb, lsb)) >> lsb);
 }
 
 enum class OpcodeEncoding : uint8_t
@@ -117,14 +118,14 @@ enum class Cop0Encoding : uint8_t
 class Instruction
 {
 public:
-    Instruction(uint32_t value_)
+    Instruction(uint32_t value_ = 0)
     : value(value_)
     {}
 
     explicit operator uint32_t() { return value; }
 
 	// Common
-    inline uint8_t  op() { return extract(value, 31, 26);}
+    inline OpcodeEncoding  op() { return extract<OpcodeEncoding>(value, 31, 26);}
     inline uint8_t  rs() { return extract(value, 25, 21);}
     inline uint8_t  rt() { return extract(value, 20, 16);}
 
