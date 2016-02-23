@@ -5,6 +5,9 @@ compiler:
     - clang
 
 before_script:
+    - sudo add-apt-reposotory ppa:george-edison55/precise-backports -y
+    - sudo apt-get update -qq
+    - sudo apt-get install cmake cmake-data -y
     - mkdir build
     - cd build
     - cmake ..
