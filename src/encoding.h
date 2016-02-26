@@ -105,6 +105,14 @@ enum class Cop0Encoding : uint8_t
 	RFE=16,
 };
 
+/* This is used as the control signal to the memory pipeline stage*/
+enum class MemOp : uint8_t
+{
+	NOP = 0,
+	LOAD,
+	STORE,
+};
+
 class Instruction
 {
 public:
@@ -115,20 +123,20 @@ public:
     explicit operator uint32_t() { return value; }
 
 	// Common
-    inline OpcodeEncoding  op() { return extract<OpcodeEncoding>(value, 31, 26);}
-    inline uint8_t  rs() { return extract(value, 25, 21);}
-    inline uint8_t  rt() { return extract(value, 20, 16);}
+    inline OpcodeEncoding  op() { return extract<31, 26, OpcodeEncoding>(value);}
+    inline uint8_t  rs() { return extract<25,21>(value);}
+    inline uint8_t  rt() { return extract<20, 16>(value);}
 
 	// Immediate Instruction
-    inline uint16_t imm(){ return extract(value, 15,  0);}
+    inline uint16_t imm(){ return extract<15, 0>(value);}
 
 	// Jump Instruction
-	inline uint32_t target() { return extract(value, 25, 0); }
+	inline uint32_t target() { return extract<25, 0>(value); }
 
 	// Register Instruction
-	inline uint8_t rd()    { return extract(value, 15, 11); }
-	inline uint8_t shamt() { return extract(value, 10, 6); }
-	inline uint8_t funct() { return extract(value, 5, 0); }
+	inline uint8_t         rd()    { return extract<15, 11>(value); }
+	inline uint8_t         shamt() { return extract<10, 6>(value); }
+	inline SpecialEncoding funct() { return extract<5, 0, SpecialEncoding>(value); }
 private:
 	uint32_t value;
 };

@@ -12,7 +12,8 @@ public:
 
     void FetchInstruction(void);
     void DecodeInstruction(void);
-    void ExecuteALU(void);
+	void ExecuteALU(void);
+    void ExecuteAndAddressCalc(void);
     void AccessMemory(void);
     void Writeback(void);
 	void Start(void);
@@ -120,8 +121,39 @@ public:
     uint32_t hi;
     uint32_t lo;
 
-	Instruction fetch_instruction;
-	Instruction decode_instruction;
+	/* These structures contains the inputs to the five output stages. */
+	struct
+	{
+		Instruction instruction;
+	}IF;
+	struct
+	{
+		Instruction instruction;
+	}ID;
+	struct
+	{
+		Instruction     instruction;
+		SpecialEncoding alu_control;
+		uint32_t        read_data_0;
+		uint32_t        read_data_1;
+		uint32_t        sign_extended_data;
+	}EX;
+	struct
+	{
+		Instruction instruction;
+		uint32_t    branch_addr;
+		uint32_t    alu_out;
+		uint32_t    write_data;
+		MemOp       op;
+	}MEM;
+	struct
+	{
+		Instruction instruction;
+		uint32_t    read_data;
+		uint32_t    alu_out;
+	}WB;
+
+	uint32_t alu_in_mux;
 
 	Memory &memory;
 };

@@ -12,9 +12,9 @@ public:
 
 	explicit operator uint32_t(){return value;}
 
-	inline uint16_t offset() { return extract<uint16_t>(value, 11, 0); }
-	inline uint32_t vpn()    { return extract<uint32_t>(value, 31, 12);}
-	inline uint8_t  seg()    { return extract<uint8_t>(value, 31, 29); }
+	inline uint16_t offset() { return extract<11,0, uint16_t>(value); }
+	inline uint32_t vpn()    { return extract<31,12, uint32_t>(value);}
+	inline uint8_t  seg()    { return extract<31,29, uint8_t>(value); }
 
 private:
 	uint32_t value;
