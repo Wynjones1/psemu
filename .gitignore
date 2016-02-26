@@ -1,6 +1,9 @@
 # Build directories
 build
 
+# BIOS directories
+bios
+
 # Compiled Object files
 *.slo
 *.lo
