@@ -1,6 +1,7 @@
 #ifndef GPU_H
 #define GPU_H
 #include <array>
+#include <stdint.h>
 
 constexpr uint32_t FB_WIDTH  = 1024;
 constexpr uint32_t FB_HEIGHT = 512;
