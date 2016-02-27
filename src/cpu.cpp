@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "memory.h"
 #include "encoding.h"
+#include <string.h>
 
 #if 0
 #define TODO(X) static_assert(false, "TODO:" #X)
