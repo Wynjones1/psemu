@@ -1,5 +1,6 @@
 #ifndef BIT_MANIPULATION
 #define BIT_MANIPULATION
+#include <type_traits>
 
 template<unsigned int MSB, unsigned int LSB>
 constexpr uint32_t mask()
