@@ -47,6 +47,41 @@ enum class OpcodeEncoding : uint8_t
 	SWC3,
 };
 
+inline bool is_special(OpcodeEncoding encoding)
+{
+	return (encoding == OpcodeEncoding::SPECIAL);
+};
+
+inline bool is_branch(OpcodeEncoding encoding)
+{
+	return (OpcodeEncoding::J <= encoding && encoding <= OpcodeEncoding::BGTZ);
+}
+
+inline bool is_memory_access(OpcodeEncoding encoding)
+{
+	return (OpcodeEncoding::LB <= encoding && encoding <= OpcodeEncoding::SWR);
+}
+
+inline bool is_load(OpcodeEncoding encoding)
+{
+	return (OpcodeEncoding::LB <= encoding && encoding <= OpcodeEncoding::LWR);
+}
+
+inline bool is_store(OpcodeEncoding encoding)
+{
+	return (OpcodeEncoding::SB <= encoding && encoding <= OpcodeEncoding::SWR);
+}
+
+inline bool is_immediate(OpcodeEncoding encoding)
+{
+	return (OpcodeEncoding::ADDI <= encoding && encoding <= OpcodeEncoding::LUI);
+}
+
+inline bool is_cop(OpcodeEncoding encoding)
+{
+	return (OpcodeEncoding::COP0 <= encoding && encoding <= OpcodeEncoding::COP3);
+}
+
 enum class SpecialEncoding : uint8_t
 {
 	SLL = 0,
@@ -105,14 +140,6 @@ enum class Cop0Encoding : uint8_t
 	RFE=16,
 };
 
-/* This is used as the control signal to the memory pipeline stage*/
-enum class MemOp : uint8_t
-{
-	NOP = 0,
-	LOAD,
-	STORE,
-};
-
 class Instruction
 {
 public:
@@ -137,6 +164,42 @@ public:
 	inline uint8_t         rd()    { return extract<15, 11>(value); }
 	inline uint8_t         shamt() { return extract<10, 6>(value); }
 	inline SpecialEncoding funct() { return extract<5, 0, SpecialEncoding>(value); }
+
+
+	inline bool is_special()
+	{
+		return (op() == OpcodeEncoding::SPECIAL);
+	};
+
+	inline bool is_branch()
+	{
+		return (OpcodeEncoding::J <= op() && op() <= OpcodeEncoding::BGTZ);
+	}
+
+	inline bool is_memory_access()
+	{
+		return (OpcodeEncoding::LB <= op() && op() <= OpcodeEncoding::SWR);
+	}
+
+	inline bool is_load()
+	{
+		return (OpcodeEncoding::LB <= op() && op() <= OpcodeEncoding::LWR);
+	}
+
+	inline bool is_store()
+	{
+		return (OpcodeEncoding::SB <= op() && op() <= OpcodeEncoding::SWR);
+	}
+
+	inline bool is_immediate()
+	{
+		return (OpcodeEncoding::ADDI <= op() && op() <= OpcodeEncoding::LUI);
+	}
+
+	inline bool is_cop()
+	{
+		return (OpcodeEncoding::COP0 <= op() && op() <= OpcodeEncoding::COP3);
+	}
 private:
 	uint32_t value;
 };

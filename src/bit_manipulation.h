@@ -15,21 +15,25 @@ constexpr T extract(uint32_t value)
 	return T((value & mask<MSB, LSB>()) >> LSB);
 }
 
-inline uint32_t sign_extend(uint16_t in)
+template<typename T0, typename T1 = uint32_t>
+inline T1 sign_extend(T0 in)
 {
+	static_assert(std::is_unsigned<T0>::value, "Input must be an unsigned type.");
+	static_assert(std::is_unsigned<T1>::value, "Input must be an unsigned type.");
+	
 	union
 	{
-		uint16_t u;
-		int16_t  i;
-	}temp16;
+		std::make_signed<T0>::type i;
+		T0  u;
+	}temp_in;
 	union
 	{
-		uint32_t u;
-		int32_t  i;
-	}temp32;
+		std::make_signed<T1>::type i;
+		T1 u;
+	}temp_out;
 
-	temp16.u = in;
-	temp32.i = temp16.i;
-	return temp32.u;
+	temp_in.u  = in;
+	temp_out.i = temp_in.i;
+	return temp_out.u;
 }
 #endif

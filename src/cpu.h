@@ -10,13 +10,15 @@ class CPU
 public:
 	CPU(Memory &memory);
 
-    void FetchInstruction(void);
-    void DecodeInstruction(void);
-	void ExecuteALU(void);
-    void ExecuteAndAddressCalc(void);
-    void AccessMemory(void);
-    void Writeback(void);
-	void Start(void);
+    void     FetchInstruction(void);
+    void     DecodeInstruction(void);
+    void     Execute(void);
+    void     AccessMemory(void);
+    void     Writeback(void);
+	void     Start(void);
+	uint32_t ExecuteSpecial(void);
+	uint32_t ExecuteImmediate(void);
+	uint32_t ExecuteBranch(void);
 
 	// Load Instructions.
 	void LB(void);
@@ -116,7 +118,16 @@ public:
 
 
 public:
-    uint32_t registers[32];
+	struct
+	{
+		uint32_t data[32];
+		uint32_t &operator [](unsigned int index)
+		{
+			// Ensure that all accesses to this register return 0.
+			data[0] = 0;
+			return data[index];
+		}
+	}registers;
     uint32_t pc;
     uint32_t hi;
     uint32_t lo;
@@ -134,8 +145,6 @@ public:
 	{
 		Instruction     instruction;
 		SpecialEncoding alu_control;
-		uint32_t        read_data_0;
-		uint32_t        read_data_1;
 		uint32_t        sign_extended_data;
 	}EX;
 	struct
@@ -144,7 +153,6 @@ public:
 		uint32_t    branch_addr;
 		uint32_t    alu_out;
 		uint32_t    write_data;
-		MemOp       op;
 	}MEM;
 	struct
 	{
@@ -152,8 +160,6 @@ public:
 		uint32_t    read_data;
 		uint32_t    alu_out;
 	}WB;
-
-	uint32_t alu_in_mux;
 
 	Memory &memory;
 };

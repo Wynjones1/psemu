@@ -1,6 +1,7 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 #include <stdint.h>
+#include <map>
 #include "bit_manipulation.h"
 
 class VirtualAddress
@@ -23,8 +24,14 @@ private:
 class Memory
 {
 public:
-	uint32_t Load(uint32_t address);
-	void     Store(uint32_t address, uint32_t value);
+	uint32_t LoadWord(uint32_t address);
+	uint16_t LoadHalfWord(uint32_t address);
+	uint8_t  LoadByte(uint32_t address);
+	void     StoreWord(uint32_t address, uint32_t value);
+	void     StoreHalfWord(uint32_t address, uint16_t value);
+	void     StoreByte(uint32_t address, uint8_t value);
+
+	std::map<uint32_t, uint32_t> data;
 };
 
 #endif
