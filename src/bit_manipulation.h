@@ -24,12 +24,12 @@ inline T1 sign_extend(T0 in)
 	
 	union
 	{
-		std::make_signed<T0>::type i;
+		typename std::make_signed<T0>::type i;
 		T0  u;
 	}temp_in;
 	union
 	{
-		std::make_signed<T1>::type i;
+		typename std::make_signed<T1>::type i;
 		T1 u;
 	}temp_out;
 
