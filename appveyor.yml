@@ -1,0 +1,25 @@
+environment:
+  P: "c:/projects/psemu"
+
+branches:
+    only:
+        - master
+
+os: Visual Studio 2015
+
+init:
+    - git config --global core.autocrlf input
+
+clone_folder: c:/projects/psemu
+
+platform: x64
+configuration: Release
+
+build:
+    project: ALL_BUILD.vcxproj
+
+before_build:
+    - echo Running CMake...
+    - mkdir build
+    - cd build
+    - cmake -G "Visual Studio 14 2015 Win64" c:/projects/psemu
