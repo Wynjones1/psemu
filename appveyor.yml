@@ -16,10 +16,10 @@ platform: x64
 configuration: Release
 
 build:
-    - cmake --build .
 
-before_build:
+build_script:
     - echo Running CMake...
     - mkdir build
     - cd build
     - cmake -G "Visual Studio 14 2015 Win64" c:/projects/psemu
+    - cmake --build . --config Release
