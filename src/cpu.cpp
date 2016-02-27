@@ -124,28 +124,45 @@ void CPU::Execute(void)
 
 void CPU::AccessMemory(void)
 {
+	// Used by LWL and LWR to store intermediate results.
+	uint32_t read_word;
+	uint32_t byte_count;
 	if (MEM.instruction.is_load())
 	{
+		auto &reg = registers[MEM.instruction.rt()];
 		switch (MEM.instruction.op())
 		{
 		case OpcodeEncoding::LB:
-			registers[MEM.instruction.rt()] = sign_extend(memory.LoadByte(MEM.alu_out));
+			reg = sign_extend(memory.LoadByte(MEM.alu_out));
 			break;
 		case OpcodeEncoding::LH:
-			registers[MEM.instruction.rt()] = sign_extend(memory.LoadHalfWord(MEM.alu_out));
+			reg = sign_extend(memory.LoadHalfWord(MEM.alu_out));
 			break;
 		case OpcodeEncoding::LWL:
+			read_word = memory.LoadWord((MEM.alu_out >> 2) << 2);
+			// How many of the least significant bytes of the register to keep.
+			byte_count = 3 - (MEM.alu_out & 0x3);
+			// Copy the retained bits to the read word.
+			memcpy(&read_word, &reg, byte_count);
+			// Write back into the register.
+			reg = read_word;
 			break;
 		case OpcodeEncoding::LW:
-			registers[MEM.instruction.rt()] = memory.LoadWord(MEM.alu_out);
+			reg = memory.LoadWord(MEM.alu_out);
 			break;
 		case OpcodeEncoding::LBU:
-			registers[MEM.instruction.rt()] = memory.LoadByte(MEM.alu_out);
+			reg = memory.LoadByte(MEM.alu_out);
 			break;
 		case OpcodeEncoding::LHU:
-			registers[MEM.instruction.rt()] = memory.LoadHalfWord(MEM.alu_out);
+			reg = memory.LoadHalfWord(MEM.alu_out);
 			break;
 		case OpcodeEncoding::LWR:
+			read_word = memory.LoadWord((MEM.alu_out >> 2) << 2);
+			// How many bytes of the read word to actually copy into the register.
+			byte_count = 4 - (MEM.alu_out & 0x3);
+			// Shift bytes to be copied to the lsb.
+			read_word >>= 8 * (MEM.alu_out & 0x3);
+			memcpy(&reg, &read_word, byte_count);
 			break;
 		}
 	}

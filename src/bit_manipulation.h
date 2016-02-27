@@ -2,18 +2,15 @@
 #define BIT_MANIPULATION
 #include <type_traits>
 
-template<unsigned int MSB, unsigned int LSB>
-constexpr uint32_t mask()
+constexpr uint32_t mask(unsigned int MSB, unsigned int LSB)
 {
-	static_assert(MSB >= LSB, "LSB cannot be greater than MSB");
-	static_assert(MSB < 32, "MSB cannot be greater than 31");
 	return (((uint64_t(1) << (MSB + 1)) - 1) >> LSB) << LSB;
 }
 
-template<unsigned int MSB, unsigned int LSB, typename T = uint32_t>
-constexpr T extract(uint32_t value)
+template<typename T = uint32_t>
+constexpr T extract(uint32_t value, unsigned int MSB, unsigned int LSB)
 {
-	return T((value & mask<MSB, LSB>()) >> LSB);
+	return T((value & mask(MSB, LSB)) >> LSB);
 }
 
 template<typename T0, typename T1 = uint32_t>

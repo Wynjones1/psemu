@@ -150,20 +150,20 @@ public:
     explicit operator uint32_t() { return value; }
 
 	// Common
-    inline OpcodeEncoding  op() { return extract<31, 26, OpcodeEncoding>(value);}
-    inline uint8_t  rs() { return extract<25,21>(value);}
-    inline uint8_t  rt() { return extract<20, 16>(value);}
+    inline OpcodeEncoding  op() { return extract<OpcodeEncoding>(value, 31, 26);}
+    inline uint8_t  rs() { return extract(value, 25, 21);}
+    inline uint8_t  rt() { return extract(value, 20, 16);}
 
 	// Immediate Instruction
-    inline uint16_t imm(){ return extract<15, 0>(value);}
+    inline uint16_t imm(){ return extract(value, 15, 0);}
 
 	// Jump Instruction
-	inline uint32_t target() { return extract<25, 0>(value); }
+	inline uint32_t target() { return extract(value, 25, 0); }
 
 	// Register Instruction
-	inline uint8_t         rd()    { return extract<15, 11>(value); }
-	inline uint8_t         shamt() { return extract<10, 6>(value); }
-	inline SpecialEncoding funct() { return extract<5, 0, SpecialEncoding>(value); }
+	inline uint8_t         rd()    { return extract(value, 15, 11); }
+	inline uint8_t         shamt() { return extract(value, 10, 6); }
+	inline SpecialEncoding funct() { return extract<SpecialEncoding>(value, 5, 0); }
 
 
 	inline bool is_special()
