@@ -27,6 +27,15 @@ void CPU::DecodeInstruction(void)
 
 void CPU::ExecuteInstruction(const Instruction & instruction)
 {
+	auto nop = Instruction(OpcodeEncoding::ADDI, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
+	for (int i = 0; i < 5; i++)
+	{
+		FetchInstruction();
+		DecodeInstruction();
+		Execute();
+		AccessMemory();
+		Writeback();
+	}
 }
 
 uint32_t CPU::ExecuteSpecial(void)

@@ -210,8 +210,7 @@ public:
 	Instruction(OpcodeEncoding  opcode_,
 				Register        rs_,
 				Register        rt_,
-				uint16_t        imm_,
-				SpecialEncoding funct_)
+				uint16_t        imm_)
 		: value(0)
 	{
 		encode(value, (uint32_t)opcode_, 31, 26);
