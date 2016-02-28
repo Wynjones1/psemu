@@ -199,6 +199,27 @@ public:
 		encode(value, (uint32_t) funct_,   5,  0);
 	}
 
+	Instruction(OpcodeEncoding opcode_,
+			    uint32_t       target_)
+		: value(0)
+	{
+		encode(value, (uint32_t)opcode_, 31, 26);
+		encode(value, (uint32_t)target_, 25,  0);
+	}
+
+	Instruction(OpcodeEncoding  opcode_,
+				Register        rs_,
+				Register        rt_,
+				uint16_t        imm_,
+				SpecialEncoding funct_)
+		: value(0)
+	{
+		encode(value, (uint32_t)opcode_, 31, 26);
+		encode(value, (uint32_t)rs_,     25, 21);
+		encode(value, (uint32_t)rt_,     20, 16);
+		encode(value, (uint32_t)imm_,    15,  0);
+	}
+
     explicit operator uint32_t() { return value; }
 
 	// Common

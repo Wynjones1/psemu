@@ -25,6 +25,10 @@ void CPU::DecodeInstruction(void)
 	EX.sign_extended_data = sign_extend(ID.instruction.imm());
 }
 
+void CPU::ExecuteInstruction(const Instruction & instruction)
+{
+}
+
 uint32_t CPU::ExecuteSpecial(void)
 {
 	TODO("Implement");

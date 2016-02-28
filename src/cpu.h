@@ -19,6 +19,7 @@ public:
 	uint32_t ExecuteSpecial(void);
 	uint32_t ExecuteImmediate(void);
 	uint32_t ExecuteBranch(void);
+	void     ExecuteInstruction(const Instruction &instruction);
 
 	// Load Instructions.
 	void LB(void);
