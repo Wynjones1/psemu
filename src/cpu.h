@@ -116,16 +116,15 @@ public:
 	void TLBP(void);
 	void RFE(void);
 
-
 public:
 	struct
 	{
 		uint32_t data[32];
-		uint32_t &operator [](unsigned int index)
+		uint32_t &operator [](Register index)
 		{
 			// Ensure that all accesses to this register return 0.
 			data[0] = 0;
-			return data[index];
+			return data[(uint8_t)index];
 		}
 	}registers;
     uint32_t pc;

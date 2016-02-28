@@ -140,6 +140,43 @@ enum class Cop0Encoding : uint8_t
 	RFE=16,
 };
 
+enum class Register : uint8_t
+{
+	R0 , ZERO = R0,
+	R1 , AT = R1,
+	R2 , V0 = R2,
+	R3 , V1 = R3,
+	R4 , A0 = R4,
+	R5 , A1 = R5,
+	R6 , A2 = R6,
+	R7 , A3 = R7,
+	R8 , T0 = R8,
+	R9 , T1 = R9,
+	R10, T2 = R10,
+	R11, T3 = R11,
+	R12, T4 = R12,
+	R13, T5 = R13,
+	R14, T6 = R14,
+	R15, T7 = R15,
+	R16, S0 = R16,
+	R17, S1 = R17,
+	R18, S2 = R18,
+	R19, S3 = R19,
+	R20, S4 = R20,
+	R21, S5 = R21,
+	R22, S6 = R22,
+	R23, S7 = R23,
+	R24, T8 = R24,
+	R25, T9 = R25,
+	R26, K0 = R26,
+	R27, K1 = R27,
+	R28, GP = R28,
+	R29, SP = R29,
+	R30, S8 = R30, FP = R30,
+	R31, RA = R31,
+	NUM_REGISTERS,
+};
+
 class Instruction
 {
 public:
@@ -147,12 +184,27 @@ public:
     : value(value_)
     {}
 
+	Instruction(OpcodeEncoding  opcode_,
+				Register        rs_,
+				Register        rt_,
+				Register        rd_,
+				uint8_t         sa_,
+				SpecialEncoding funct_)
+	: value(0)
+	{
+		encode(value, (uint32_t) opcode_, 31, 26);
+		encode(value, (uint32_t) rs_,     25, 21);
+		encode(value, (uint32_t) rt_,     20, 16);
+		encode(value, (uint32_t) sa_,     10,  6);
+		encode(value, (uint32_t) funct_,   5,  0);
+	}
+
     explicit operator uint32_t() { return value; }
 
 	// Common
     inline OpcodeEncoding  op() { return extract<OpcodeEncoding>(value, 31, 26);}
-    inline uint8_t  rs() { return extract(value, 25, 21);}
-    inline uint8_t  rt() { return extract(value, 20, 16);}
+    inline Register        rs() { return extract<Register>(value, 25, 21);}
+    inline Register        rt() { return extract<Register>(value, 20, 16);}
 
 	// Immediate Instruction
     inline uint16_t imm(){ return extract(value, 15, 0);}
@@ -161,7 +213,7 @@ public:
 	inline uint32_t target() { return extract(value, 25, 0); }
 
 	// Register Instruction
-	inline uint8_t         rd()    { return extract(value, 15, 11); }
+	inline Register        rd()    { return extract<Register>(value, 15, 11); }
 	inline uint8_t         shamt() { return extract(value, 10, 6); }
 	inline SpecialEncoding funct() { return extract<SpecialEncoding>(value, 5, 0); }
 
