@@ -43,4 +43,29 @@ inline T1 sign_extend(T0 in)
 	temp_out.i = temp_in.i;
 	return temp_out.u;
 }
+
+template<typename T= int32_t>
+inline auto conv_to_unsigned(const T in) -> decltype(auto)
+{
+	union
+	{
+		T signed_;
+		typename std::make_unsigned<T>::type unsigned_;
+	}temp;
+	temp.signed_ = in;
+	return temp.unsigned_;
+}
+
+template<typename T = uint32_t>
+inline auto conv_to_signed(const T in) -> decltype(auto)
+{
+	union
+	{
+		T signed_;
+		typename std::make_signed<T>::type unsigned_;
+	}temp;
+	temp.signed_ = in;
+	return temp.unsigned_;
+}
+
 #endif
