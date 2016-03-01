@@ -45,7 +45,7 @@ inline T1 sign_extend(T0 in)
 }
 
 template<typename T= int32_t>
-inline auto conv_to_unsigned(const T in) -> decltype(auto)
+inline auto conv_to_unsigned(const T in) -> typename std::make_unsigned<T>::type
 {
 	union
 	{
