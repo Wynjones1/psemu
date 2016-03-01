@@ -9,8 +9,32 @@
 #define TODO(X)
 #endif
 
-CPU::CPU(Memory &memory_) : memory(memory_)
-{}
+CPU::CPU(Memory &memory_)
+	: memory(memory_) 
+{
+	Reset();
+}
+
+void CPU::Reset()
+{
+	// Zero all of the registers.
+	for (auto &x : registers.data)
+	{
+		x = 0;
+	}
+	pc = 0;
+	hi = 0;
+	lo = 0;
+
+	// Put nops into the pipeline
+	auto nop = Instruction(OpcodeEncoding::ADDI, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
+
+	IF.instruction  = nop;
+	ID.instruction  = nop;
+	EX.instruction  = nop;
+	MEM.instruction = nop;
+	WB.instruction  = nop;
+}
 
 void CPU::FetchInstruction(void)
 {
@@ -28,76 +52,110 @@ void CPU::DecodeInstruction(void)
 void CPU::ExecuteInstruction(const Instruction & instruction)
 {
 	auto nop = Instruction(OpcodeEncoding::ADDI, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
+	// Introduce the instruction into the pipeline.
+	IF.instruction = instruction;
+	// Pass the data through the pipeline (minus the instruction fetch.)
 	for (int i = 0; i < 5; i++)
 	{
-		FetchInstruction();
-		DecodeInstruction();
-		Execute();
-		AccessMemory();
 		Writeback();
+		AccessMemory();
+		Execute();
+		DecodeInstruction();
+		// Introduce nop into the pipeline.
+		ID.instruction = IF.instruction;
+		IF.instruction = nop;
 	}
 }
 
 uint32_t CPU::ExecuteSpecial(void)
 {
 	TODO("Implement");
-	switch (EX.instruction.funct())
+	SpecialEncoding funct = EX.instruction.funct();
+	switch (funct)
 	{
 	case SpecialEncoding::SLL:
+		SLL();
 		break;
 	case SpecialEncoding::SRL:
+		SRL();
 		break;
 	case SpecialEncoding::SRA:
+		SRA();
 		break;
 	case SpecialEncoding::SLLV:
+		SLLV();
 		break;
 	case SpecialEncoding::SRLV:
+		SRLV();
 		break;
 	case SpecialEncoding::SRAV:
+		SRAV();
 		break;
 	case SpecialEncoding::JR:
+		JR();
 		break;
 	case SpecialEncoding::JALR:
+		JALR();
 		break;
 	case SpecialEncoding::SYSCALL:
+		SYSCALL();
 		break;
 	case SpecialEncoding::BREAK:
+		BREAK();
 		break;
 	case SpecialEncoding::MFHI:
+		MFHI();
 		break;
 	case SpecialEncoding::MTHI:
+		MTHI();
 		break;
 	case SpecialEncoding::MFLO:
+		MFLO();
 		break;
 	case SpecialEncoding::MTLO:
+		MTLO();
 		break;
 	case SpecialEncoding::MULT:
+		MULT();
 		break;
 	case SpecialEncoding::MULTU:
+		MULTU();
 		break;
 	case SpecialEncoding::DIV:
+		DIV();
 		break;
 	case SpecialEncoding::DIVU:
+		DIVU();
 		break;
 	case SpecialEncoding::ADD:
+		ADD();
 		break;
 	case SpecialEncoding::ADDU:
+		ADDU();
 		break;
 	case SpecialEncoding::SUB:
+		SUB();
 		break;
 	case SpecialEncoding::SUBU:
+		SUBU();
 		break;
 	case SpecialEncoding::AND:
+		AND();
 		break;
 	case SpecialEncoding::OR:
+		OR();
 		break;
 	case SpecialEncoding::XOR:
+		XOR();
 		break;
 	case SpecialEncoding::NOR:
+		NOR();
 		break;
 	case SpecialEncoding::SLT:
+		SLT();
 		break;
 	case SpecialEncoding::SLTU:
+		SLTU();
 		break;
 	}
 	return 0;
@@ -105,7 +163,34 @@ uint32_t CPU::ExecuteSpecial(void)
 
 uint32_t CPU::ExecuteImmediate(void)
 {
-	TODO("Implement ExecuteImmediate");
+	auto encoding = EX.instruction.op();
+	switch (encoding)
+	{
+	case OpcodeEncoding::ADDI:
+		ADDI();
+		break;
+	case OpcodeEncoding::ADDIU:
+		ADDIU();
+		break;
+	case OpcodeEncoding::SLTI:
+		SLTI();
+		break;
+	case OpcodeEncoding::SLTIU:
+		SLTIU();
+		break;
+	case OpcodeEncoding::ANDI:
+		ANDI();
+		break;
+	case OpcodeEncoding::ORI:
+		ORI();
+		break;
+	case OpcodeEncoding::XORI:
+		XORI();
+		break;
+	case OpcodeEncoding::LUI:
+		LUI();
+		break;
+	}
 	return 0;
 }
 
@@ -118,6 +203,7 @@ uint32_t CPU::ExecuteBranch(void)
 void CPU::Execute(void)
 {
 	auto op = EX.instruction.op();
+	MEM.instruction = EX.instruction;
 	if (is_special(op))
 	{
 		MEM.alu_out = ExecuteSpecial();
@@ -141,6 +227,7 @@ void CPU::AccessMemory(void)
 	// Used by LWL and LWR to store intermediate results.
 	uint32_t read_word;
 	uint32_t byte_count;
+	WB.instruction = MEM.instruction;
 	if (MEM.instruction.is_load())
 	{
 		auto &reg = registers[MEM.instruction.rt()];
@@ -207,12 +294,18 @@ void CPU::Start(void)
 {
 	while (1)
 	{
-		FetchInstruction();
-		DecodeInstruction();
+		// Perform the stages in reverse, using the values from the last clock cycle.
+		Writeback();
 		Execute();
 		AccessMemory();
-		Writeback();
+		DecodeInstruction();
+		FetchInstruction();
 	}
+}
+void CPU::TriggerOverflowException()
+{
+	TODO("Implement");
+	debug_state.has_overflown = true;
 }
 
 // Load Instructions.
@@ -341,7 +434,22 @@ void CPU::ADDI(void)
 	/* ADDI rt, rs, immediate
 		Add 16 - bit sign - extended immediate to register rs and place 32 -
 		bit result in register rt.Trap on two’s complement overflow.*/
-	TODO("Implement");
+	auto &rs = registers[EX.instruction.rs()];
+	auto &rt = registers[EX.instruction.rt()];
+	auto sum = rs + EX.sign_extended_data;
+	auto rs_neg = extract(rs, 31, 31);
+	auto imm_neg = extract(EX.sign_extended_data, 31, 31);
+	auto sum_neg = extract(sum, 31, 31);
+
+	if ((rs_neg && imm_neg && !sum_neg) || // Negative overflow.
+		(!rs_neg && !imm_neg && sum_neg))  // Positive overflow.
+	{
+		TriggerOverflowException();
+	}
+	else
+	{
+		rt = sum;
+	}
 }
 
 void CPU::ADDIU(void)
@@ -349,6 +457,10 @@ void CPU::ADDIU(void)
 	/* ADDIU rt, rs, immediate
 		Add 16 - bit sign - extended immediate to register rs and place 32 -
 		bit result in register rt.Do not trap on overflow.*/
+	auto &rs = registers[EX.instruction.rs()];
+	auto &rt = registers[EX.instruction.rt()];
+	auto sum = rs + EX.sign_extended_data;
+	rt = sum;
 }
 
 void CPU::SLTI(void)
@@ -409,7 +521,18 @@ void CPU::ADD(void)
 	/* ADD rd, rs, rt
 		Add contents of registers rs and rt and place 32 - bit result in
 		register rd.Trap on two’s complement overflow.*/
-	TODO("Implement");
+	auto &rs = registers[EX.instruction.rs()];
+	auto &rt = registers[EX.instruction.rt()];
+	auto sum = rs + rt;
+	if (sum < rs)
+	{
+		TriggerOverflowException();
+	}
+	else
+	{
+		registers[EX.instruction.rd()] = sum;
+	}
+	
 }
 
 void CPU::ADDU(void)

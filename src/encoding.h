@@ -14,7 +14,7 @@ enum class OpcodeEncoding : uint8_t
 	BLEZ,
 	BGTZ,
 	ADDI = 8,
-	ADDUI,
+	ADDIU,
 	SLTI,
 	SLTIU,
 	ANDI,
@@ -195,6 +195,7 @@ public:
 		encode(value, (uint32_t) opcode_, 31, 26);
 		encode(value, (uint32_t) rs_,     25, 21);
 		encode(value, (uint32_t) rt_,     20, 16);
+		encode(value, (uint32_t) rd_,     15, 11);
 		encode(value, (uint32_t) sa_,     10,  6);
 		encode(value, (uint32_t) funct_,   5,  0);
 	}

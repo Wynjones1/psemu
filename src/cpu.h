@@ -1,6 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 #include <stdint.h>
+#include <array>
 #include "encoding.h"
 
 class Memory;
@@ -10,6 +11,7 @@ class CPU
 public:
 	CPU(Memory &memory);
 
+	void     Reset();
     void     FetchInstruction(void);
     void     DecodeInstruction(void);
     void     Execute(void);
@@ -20,6 +22,8 @@ public:
 	uint32_t ExecuteImmediate(void);
 	uint32_t ExecuteBranch(void);
 	void     ExecuteInstruction(const Instruction &instruction);
+
+	void TriggerOverflowException();
 
 	// Load Instructions.
 	void LB(void);
@@ -120,7 +124,7 @@ public:
 public:
 	struct
 	{
-		uint32_t data[32];
+		std::array<uint32_t, 32> data;
 		uint32_t &operator [](Register index)
 		{
 			// Ensure that all accesses to this register return 0.
@@ -162,6 +166,15 @@ public:
 	}WB;
 
 	Memory &memory;
+	// Debug state.
+	struct DebugState
+	{
+		DebugState()
+			: has_overflown(false)
+		{}
+
+		bool has_overflown;
+	}debug_state;
 };
 
 #endif
