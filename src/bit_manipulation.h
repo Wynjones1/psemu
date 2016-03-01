@@ -57,7 +57,7 @@ inline auto conv_to_unsigned(const T in) -> typename std::make_unsigned<T>::type
 }
 
 template<typename T = uint32_t>
-inline auto conv_to_signed(const T in) -> decltype(auto)
+inline auto conv_to_signed(const T in) -> typename std::make_signed<T>::type
 {
 	union
 	{
