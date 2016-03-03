@@ -1,300 +1,103 @@
-#include "gtest/gtest.h"
-#include "cpu.h"
-#include "memory.h"
+#include "support.h"
+#include <tuple>
 
-TEST(InstructionMULT, Test0)
+#define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint64_t>
+
+class MultDivInstruction : public InstructionTestFixture<PARAM>{};
+
+TEST_P(MultDivInstruction, Test)
 {
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 100;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.lo, 1000);
-	ASSERT_EQ(cpu.hi, 0);
+    auto param = GetParam();
+    instruction = Instruction(OpcodeEncoding::SPECIAL,
+                              Register::R1, Register::R2, Register::ZERO, 0, std::get<0>(param));
+	cpu.registers[Register::R1] = std::get<1>(param);
+	cpu.registers[Register::R2] = std::get<2>(param);
+	cpu.registers[Register::R3] = 0;
+	cpu.ExecuteInstruction(instruction);
+	ASSERT_EQ(cpu.lo, std::get<3>(param) & 0xffffffff);
+	ASSERT_EQ(cpu.hi, (std::get<3>(param) >> 32) & 0xffffffff);
 }
 
-TEST(InstructionMULT, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = conv_to_unsigned(-100);
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+INSTANTIATE_TEST_CASE_P(
+MULT, MultDivInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::MULT, 0, 0, 0),
+    PARAM(SpecialEncoding::MULT, 1, 1, 1)
+));
 
-	ASSERT_EQ(cpu.lo, conv_to_unsigned(-1000));
-	ASSERT_EQ(cpu.hi, 0);
+INSTANTIATE_TEST_CASE_P(
+MULTU, MultDivInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::MULTU, 0, 0, 0),
+    PARAM(SpecialEncoding::MULTU, 1, 1, 1)
+));
+
+INSTANTIATE_TEST_CASE_P(
+DIV, MultDivInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::DIV, 0, 0, 0),
+    PARAM(SpecialEncoding::DIV, 1, 1, 1)
+));
+
+INSTANTIATE_TEST_CASE_P(
+DIVU, MultDivInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::DIVU, 0, 0, 0),
+    PARAM(SpecialEncoding::DIVU, 1, 1, 1)
+));
+
+#undef PARAM
+#define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint32_t, bool>
+class AddSubInstruction : public InstructionTestFixture<PARAM>{};
+
+TEST_P(AddSubInstruction, Test)
+{
+    auto param = GetParam();
+    instruction = Instruction(OpcodeEncoding::SPECIAL,
+                              Register::R1, Register::R2, Register::R3, 0, std::get<0>(param));
+	cpu.registers[Register::R1] = std::get<1>(param);
+	cpu.registers[Register::R2] = std::get<2>(param);
+	cpu.registers[Register::R3] = 0;
+	cpu.ExecuteInstruction(instruction);
+	ASSERT_EQ(cpu.registers[Register::R3], std::get<3>(param));
+    ASSERT_EQ(cpu.debug_state.has_overflown, std::get<4>(param));
 }
 
-TEST(InstructionMULT, LargestMult0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = INT32_MAX;
-	cpu.registers[Register::R2] = INT32_MAX;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+INSTANTIATE_TEST_CASE_P(
+ADD, AddSubInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::ADD, 0, 0, 0, false),
+    PARAM(SpecialEncoding::ADD, 1, 1, 2, false)
+));
 
-	uint64_t temp = uint64_t(INT32_MAX) * INT32_MAX;
-	ASSERT_EQ(cpu.lo, temp & 0xffffffff);
-	ASSERT_EQ(cpu.hi, (temp >> 32) & 0xffffffff);
-}
+INSTANTIATE_TEST_CASE_P(
+ADDU, AddSubInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::ADDU, 0,          0, 0, false),
+    PARAM(SpecialEncoding::ADDU, 1,          0, 1, false),
+    PARAM(SpecialEncoding::ADDU, 1,          1, 2, false),
+    PARAM(SpecialEncoding::ADDU, UINT32_MAX, 1, 0, false),
+    PARAM(SpecialEncoding::ADDU, 1, UINT32_MAX, 0, false)
+));
 
-TEST(InstructionMULT, LargestMult1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = INT32_MIN;
-	cpu.registers[Register::R2] = INT32_MAX;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+INSTANTIATE_TEST_CASE_P(
+SUB, AddSubInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SUB, 0, 0, 0, false),
+    PARAM(SpecialEncoding::SUB, 1, 1, 0, false)
+));
 
-	int64_t temp = int64_t(INT32_MAX) * INT32_MIN;
-	ASSERT_EQ(cpu.lo, conv_to_unsigned(temp) & 0xffffffff);
-	ASSERT_EQ(cpu.hi, (conv_to_unsigned(temp) >> 32) & 0xffffffff);
-}
+INSTANTIATE_TEST_CASE_P(
+SUBU, AddSubInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SUBU, 0, 0, 0, false),
+    PARAM(SpecialEncoding::SUBU, 1, 1, 0, false)
+));
 
-TEST(InstructionMULT, LargestMult2)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = INT32_MIN;
-	cpu.registers[Register::R2] = INT32_MIN;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+INSTANTIATE_TEST_CASE_P(
+ADD_Overflow, AddSubInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::ADD, 1, UINT32_MAX, 0, true),
+    PARAM(SpecialEncoding::ADD, UINT32_MAX, 1, 0, true)
+));
 
-	int64_t temp = int64_t(INT32_MIN) * INT32_MIN;
-	ASSERT_EQ(cpu.lo, conv_to_unsigned(temp) & 0xffffffff);
-	ASSERT_EQ(cpu.hi, (conv_to_unsigned(temp) >> 32) & 0xffffffff);
-}
-
-TEST(InstructionMULTU, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULTU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 100;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.lo, 1000);
-	ASSERT_EQ(cpu.hi, 0);
-}
-
-TEST(InstructionMULTU, LargestMult)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::MULTU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = UINT32_MAX;
-	cpu.registers[Register::R2] = UINT32_MAX;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	uint64_t temp = uint64_t(UINT32_MAX) * UINT32_MAX;
-	ASSERT_EQ(cpu.lo, temp & 0xffffffff);
-	ASSERT_EQ(cpu.hi, (temp >> 32) & 0xffffffff);
-}
-
-TEST(InstructionMULTU, WaitTwoClocks)
-{
-	FAIL();
-}
-
-TEST(InstructionDIVU, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::DIVU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 100;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.lo, 10);
-	ASSERT_EQ(cpu.hi, 0);
-}
-
-TEST(InstructionDIVU, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::DIVU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 100;
-	cpu.registers[Register::R2] = 11;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.lo, 100 / 11);
-	ASSERT_EQ(cpu.hi, 100 % 11);
-}
-
-TEST(InstructionDIV, WaitTwoClockCycles)
-{
-	FAIL();
-}
-
-TEST(InstructionDIV, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::DIV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 100;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.lo, 10);
-	ASSERT_EQ(cpu.hi, 0);
-}
-
-TEST(InstructionDIV, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::ZERO, 0, SpecialEncoding::DIV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = conv_to_unsigned(-100);
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.lo, conv_to_unsigned(-10));
-	ASSERT_EQ(cpu.hi, 0);
-}
-
-TEST(InstructionDIVU, WaitTwoClockCycles)
-{
-	FAIL();
-}
-
-TEST(InstructionADD, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::ADD);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = 11;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 20);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionADD, Overflow0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::ADD);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 0xffffffff;
-	cpu.registers[Register::R2] = 0xffffffff;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	/* The value in the register should be unchanged due to the overflow. */
-	ASSERT_EQ(cpu.registers[Register::R3], 0);
-	ASSERT_TRUE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionADDU, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::ADDU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = 10;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 20);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionADDU, Overflow0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::ADDU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 0xffffffff;
-	cpu.registers[Register::R2] = 0xffffffff;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0xfffffffe);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionSUB, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SUB);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 1123;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionSUB, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SUB);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = conv_to_unsigned(-10);
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 20);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionSUB, Test2)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SUB);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = conv_to_unsigned(-10);
-	cpu.registers[Register::R2] = 10;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], conv_to_unsigned(-20));
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionSUBU, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SUBU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = 10;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
-
-TEST(InstructionSUBU, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SUBU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = conv_to_unsigned(-10);
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 20);
-	ASSERT_FALSE(cpu.debug_state.has_overflown);
-}
+INSTANTIATE_TEST_CASE_P(
+SUB_Overflow, AddSubInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SUB, 1,          2, 0, true),
+    PARAM(SpecialEncoding::SUB, INT32_MAX, -1, 0, true),
+    PARAM(SpecialEncoding::SUB, INT32_MIN,  1, 0, true)
+));
 
 /*
 SLL

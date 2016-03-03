@@ -69,94 +69,37 @@ void CPU::ExecuteInstruction(const Instruction & instruction)
 
 uint32_t CPU::ExecuteSpecial(void)
 {
-	TODO("Implement");
 	SpecialEncoding funct = EX.instruction.funct();
 	switch (funct)
 	{
-	case SpecialEncoding::SLL:
-		SLL();
-		break;
-	case SpecialEncoding::SRL:
-		SRL();
-		break;
-	case SpecialEncoding::SRA:
-		SRA();
-		break;
-	case SpecialEncoding::SLLV:
-		SLLV();
-		break;
-	case SpecialEncoding::SRLV:
-		SRLV();
-		break;
-	case SpecialEncoding::SRAV:
-		SRAV();
-		break;
-	case SpecialEncoding::JR:
-		JR();
-		break;
-	case SpecialEncoding::JALR:
-		JALR();
-		break;
-	case SpecialEncoding::SYSCALL:
-		SYSCALL();
-		break;
-	case SpecialEncoding::BREAK:
-		BREAK();
-		break;
-	case SpecialEncoding::MFHI:
-		MFHI();
-		break;
-	case SpecialEncoding::MTHI:
-		MTHI();
-		break;
-	case SpecialEncoding::MFLO:
-		MFLO();
-		break;
-	case SpecialEncoding::MTLO:
-		MTLO();
-		break;
-	case SpecialEncoding::MULT:
-		MULT();
-		break;
-	case SpecialEncoding::MULTU:
-		MULTU();
-		break;
-	case SpecialEncoding::DIV:
-		DIV();
-		break;
-	case SpecialEncoding::DIVU:
-		DIVU();
-		break;
-	case SpecialEncoding::ADD:
-		ADD();
-		break;
-	case SpecialEncoding::ADDU:
-		ADDU();
-		break;
-	case SpecialEncoding::SUB:
-		SUB();
-		break;
-	case SpecialEncoding::SUBU:
-		SUBU();
-		break;
-	case SpecialEncoding::AND:
-		AND();
-		break;
-	case SpecialEncoding::OR:
-		OR();
-		break;
-	case SpecialEncoding::XOR:
-		XOR();
-		break;
-	case SpecialEncoding::NOR:
-		NOR();
-		break;
-	case SpecialEncoding::SLT:
-		SLT();
-		break;
-	case SpecialEncoding::SLTU:
-		SLTU();
-		break;
+	case SpecialEncoding::SLL: SLL(); break;
+	case SpecialEncoding::SRL: SRL(); break;
+	case SpecialEncoding::SRA: SRA(); break;
+	case SpecialEncoding::SLLV: SLLV(); break;
+	case SpecialEncoding::SRLV: SRLV(); break;
+	case SpecialEncoding::SRAV: SRAV(); break;
+	case SpecialEncoding::JR: JR(); break;
+	case SpecialEncoding::JALR: JALR(); break;
+	case SpecialEncoding::SYSCALL: SYSCALL(); break;
+	case SpecialEncoding::BREAK: BREAK(); break;
+	case SpecialEncoding::MFHI: MFHI(); break;
+	case SpecialEncoding::MTHI: MTHI(); break;
+	case SpecialEncoding::MFLO: MFLO(); break;
+	case SpecialEncoding::MTLO: MTLO(); break;
+	case SpecialEncoding::MULT: MULT(); break;
+	case SpecialEncoding::MULTU: MULTU(); break;
+	case SpecialEncoding::DIV: DIV(); break;
+	case SpecialEncoding::DIVU: DIVU(); break;
+	case SpecialEncoding::ADD: ADD(); break;
+	case SpecialEncoding::ADDU: ADDU(); break;
+	case SpecialEncoding::SUB: SUB(); break;
+	case SpecialEncoding::SUBU: SUBU(); break;
+	case SpecialEncoding::AND: AND(); break;
+	case SpecialEncoding::OR: OR(); break;
+	case SpecialEncoding::XOR: XOR(); break;
+	case SpecialEncoding::NOR: NOR(); break;
+	case SpecialEncoding::SLT: SLT(); break;
+	case SpecialEncoding::SLTU: SLTU(); break;
 	}
 	return 0;
 }
@@ -166,30 +109,14 @@ uint32_t CPU::ExecuteImmediate(void)
 	auto encoding = EX.instruction.op();
 	switch (encoding)
 	{
-	case OpcodeEncoding::ADDI:
-		ADDI();
-		break;
-	case OpcodeEncoding::ADDIU:
-		ADDIU();
-		break;
-	case OpcodeEncoding::SLTI:
-		SLTI();
-		break;
-	case OpcodeEncoding::SLTIU:
-		SLTIU();
-		break;
-	case OpcodeEncoding::ANDI:
-		ANDI();
-		break;
-	case OpcodeEncoding::ORI:
-		ORI();
-		break;
-	case OpcodeEncoding::XORI:
-		XORI();
-		break;
-	case OpcodeEncoding::LUI:
-		LUI();
-		break;
+	case OpcodeEncoding::ADDI: ADDI(); break;
+	case OpcodeEncoding::ADDIU: ADDIU(); break;
+	case OpcodeEncoding::SLTI: SLTI(); break;
+	case OpcodeEncoding::SLTIU: SLTIU(); break;
+	case OpcodeEncoding::ANDI: ANDI(); break;
+	case OpcodeEncoding::ORI: ORI(); break;
+	case OpcodeEncoding::XORI: XORI(); break;
+	case OpcodeEncoding::LUI: LUI(); break;
 	}
 	return 0;
 }
@@ -540,7 +467,9 @@ void CPU::ADDU(void)
 	/* ADDU rd, rs, rt
 		Add contents of registers rs and rt and place 32 - bit result in
 		register rd.Do not trap on overflow.*/
-	TODO("Implement");
+	auto &rs = registers[EX.instruction.rs()];
+	auto &rt = registers[EX.instruction.rt()];
+    registers[EX.instruction.rd()] = rs + rt;
 }
 
 void CPU::SUB(void)
@@ -548,7 +477,9 @@ void CPU::SUB(void)
 	/* SUB rd, rs, rt
 		Subtract contents of registers rt and rs and place 32 - bit result
 		in register rd.Trap on two’s complement overflow.*/
-	TODO("Implement");
+	auto &rs = registers[EX.instruction.rs()];
+	auto &rt = registers[EX.instruction.rt()];
+    registers[EX.instruction.rd()] = rs + rt;
 }
 
 void CPU::SUBU(void)

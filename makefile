@@ -7,4 +7,4 @@ clean:
 	rm -Rf build
 
 test: all
-	cd  build && ctest .
+	cd  build && ctest . -V

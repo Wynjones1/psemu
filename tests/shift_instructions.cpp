@@ -1,198 +1,68 @@
-#include "gtest/gtest.h"
-#include "cpu.h"
-#include "memory.h"
+#include "support.h"
 
+#define PARAM std::tuple<SpecialEncoding, uint32_t, uint8_t, uint32_t>
+class ShiftImmediateInstruction : public InstructionTestFixture<PARAM>{};
 
-TEST(InstructionSLT, True0)
+TEST_P(ShiftImmediateInstruction, Test)
 {
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 5, SpecialEncoding::SLT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = 11;
+    auto param = GetParam();
+	instruction = Instruction(OpcodeEncoding::SPECIAL,
+                              Register::ZERO, Register::R1, Register::R3,
+                              std::get<2>(param), std::get<0>(param));
+	cpu.registers[Register::R1] = std::get<1>(param);
 	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+	cpu.ExecuteInstruction(instruction);
 
-	ASSERT_EQ(cpu.registers[Register::R3], 1);
+    auto result = std::get<3>(param);
+	ASSERT_EQ(cpu.registers[Register::R3], result);
 }
 
-TEST(InstructionSLT, False0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 5, SpecialEncoding::SLT);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 11;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+INSTANTIATE_TEST_CASE_P(
+SLL, ShiftImmediateInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SLL, 0, 0, 0)
+));
 
-	ASSERT_EQ(cpu.registers[Register::R3], 0);
+
+
+INSTANTIATE_TEST_CASE_P(
+SRA, ShiftImmediateInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SRA, 0, 0, 0)
+));
+
+INSTANTIATE_TEST_CASE_P(
+SRL, ShiftImmediateInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SRL, 0, 0, 0)
+));
+
+#undef PARAM
+#define PARAM std::tuple<SpecialEncoding, uint32_t, uint8_t, uint32_t>
+class ShiftRegisterInstruction: public InstructionTestFixture<PARAM>{};
+
+TEST_P(ShiftRegisterInstruction, Test)
+{
+    auto param = GetParam();
+	instruction = Instruction(OpcodeEncoding::SPECIAL,
+                              Register::R1, Register::R2, Register::R3, std::get<2>(param), std::get<0>(param));
+	cpu.registers[Register::R1] = std::get<2>(param);
+	cpu.registers[Register::R2] = std::get<1>(param);
+	cpu.registers[Register::R3] = 0x0;
+	cpu.ExecuteInstruction(instruction);
+
+    auto result = std::get<3>(param);
+	ASSERT_EQ(cpu.registers[Register::R3], result);
 }
 
-TEST(InstructionSLTU, True0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 5, SpecialEncoding::SLTU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = 11;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
+INSTANTIATE_TEST_CASE_P(
+SLLV, ShiftRegisterInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SLLV, 0, 0, 0)
+));
 
-	ASSERT_EQ(cpu.registers[Register::R3], 1);
-}
+INSTANTIATE_TEST_CASE_P(
+SRAV, ShiftRegisterInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SRAV, 0, 0, 0)
+));
 
-TEST(InstructionSLTU, False0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 5, SpecialEncoding::SLTU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 11;
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0);
-}
-
-TEST(InstructionSLTU, True1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 5, SpecialEncoding::SLTU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = conv_to_unsigned(-10);
-	cpu.registers[Register::R2] = 10;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 1);
-}
-
-TEST(InstructionSLTU, False1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 5, SpecialEncoding::SLTU);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 10;
-	cpu.registers[Register::R2] = conv_to_unsigned(-10);;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0);
-}
-
-TEST(InstructionSLL, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::ZERO, Register::R2, Register::R3, 5, SpecialEncoding::SLL);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R2] = 0xf0f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0xf0f0f0f0 << 5);
-}
-
-TEST(InstructionSRL, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::ZERO, Register::R2, Register::R3, 5, SpecialEncoding::SRL);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R2] = 0xf0f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0xf0f0f0f0 >> 5);
-}
-
-TEST(InstructionSRA, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::ZERO, Register::R2, Register::R3, 5, SpecialEncoding::SRA);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R2] = 0x00f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0x00f0f0f0 >> 5);
-}
-
-TEST(InstructionSRA, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::ZERO, Register::R2, Register::R3, 5, SpecialEncoding::SRA);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R2] = 0xffffffff;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	// Sign bit should be preserved.
-	ASSERT_EQ(cpu.registers[Register::R3], 0xffffffff);
-}
-
-TEST(InstructionSLLV, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SLLV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 7;
-	cpu.registers[Register::R2] = 0xf0f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0xf0f0f0f0 << 7);
-}
-
-TEST(InstructionSLLV, MaxShift)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SLLV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = (1 << 5) - 1;
-	cpu.registers[Register::R2] = 0xf0f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0xf0f0f0f0 << ((1 << 5) - 1));
-}
-
-TEST(InstructionSRLV, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SRLV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 7;
-	cpu.registers[Register::R2] = 0xf0f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	ASSERT_EQ(cpu.registers[Register::R3], 0xf0f0f0f0 >> 7);
-}
-
-TEST(InstructionSRAV, Test0)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SRAV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 7;
-	cpu.registers[Register::R2] = 0x00f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	// Sign bit should be preserved.
-	ASSERT_EQ(cpu.registers[Register::R3], 0x00f0f0f0 >> 7);
-}
-
-TEST(InstructionSRAV, Test1)
-{
-	Memory memory;
-	auto instr = Instruction(OpcodeEncoding::SPECIAL, Register::R1, Register::R2, Register::R3, 0, SpecialEncoding::SRAV);
-	auto cpu = CPU(memory);
-	cpu.registers[Register::R1] = 7;
-	cpu.registers[Register::R2] = 0xf0f0f0f0;
-	cpu.registers[Register::R3] = 0x0;
-	cpu.ExecuteInstruction(instr);
-
-	// Sign bit should be preserved.
-	ASSERT_EQ(cpu.registers[Register::R3], 0xf0f0f0f0 >> 7 | mask(31, 31 - 6));
-}
+INSTANTIATE_TEST_CASE_P(
+SRLV, ShiftRegisterInstruction, ::testing::Values(
+    PARAM(SpecialEncoding::SRLV, 0, 0, 0)
+));

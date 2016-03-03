@@ -2,6 +2,8 @@
 #include "cpu.h"
 #include "memory.h"
 
+#if 0
+
 TEST(InstructionAND, Test0)
 {
 	Memory memory;
@@ -53,3 +55,4 @@ TEST(InstructionNOR, Test0)
 
 	ASSERT_EQ(cpu.registers[Register::R3], ~uint32_t(0xf0f0f0f0 | 0xf0f0f0f0));
 }
+#endif

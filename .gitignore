@@ -34,3 +34,5 @@ isos
 *.exe
 *.out
 *.app
+
+log.txt
