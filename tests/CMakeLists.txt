@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 include(functions)
 setup_local_gtest()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
+
 file(GLOB_RECURSE TESTS *.cpp)
 #set(TESTS
 #    arithmetic_instructions.cpp

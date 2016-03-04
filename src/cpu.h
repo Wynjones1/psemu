@@ -4,6 +4,12 @@
 #include <array>
 #include "encoding.h"
 
+#if 0
+#define TODO(X) static_assert(false, "TODO:" #X)
+#else
+#define TODO(X)
+#endif
+
 class Memory;
 
 class CPU

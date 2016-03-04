@@ -1,6 +1,7 @@
 #include "support.h"
 #include "generic_special_instruction.h"
 
+//TEST_P(SpecialInstructionTest, Test)
 
 #undef PARAM
 #define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint32_t, bool>

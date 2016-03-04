@@ -4,6 +4,8 @@ file(GLOB_RECURSE SOURCES *.cpp)
 file(GLOB_RECURSE HEADERS *.h)
 list(REMOVE_ITEM SOURCES main.cpp)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(libpsemu ${SOURCES} ${HEADERS})
 add_executable(psemu main.cpp)
 target_link_libraries(psemu libpsemu)

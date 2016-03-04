@@ -23,7 +23,6 @@ SLL, ShiftImmediateInstruction, ::testing::Values(
 ));
 
 
-
 INSTANTIATE_TEST_CASE_P(
 SRA, ShiftImmediateInstruction, ::testing::Values(
     PARAM(SpecialEncoding::SRA, 0, 0, 0)
