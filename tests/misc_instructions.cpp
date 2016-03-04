@@ -1,20 +1,35 @@
-#include "gtest/gtest.h"
-#include "cpu.h"
-#include "memory.h"
+#include "support.h"
+#include "generic_special_instruction.h"
 
-#if 0
+
+#undef PARAM
+#define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint32_t, bool>
+
 INSTANTIATE_TEST_CASE_P(
-SLT, ShiftImmediateInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SLT, 0, 0, 0)
+SLT, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::SLT,  0, 0, 0, false),
+    PARAM(SpecialEncoding::SLT,  1, 1, 0, false),
+    PARAM(SpecialEncoding::SLT,  0, 1, 1, false),
+    PARAM(SpecialEncoding::SLT,  1, 0, 0, false),
+    PARAM(SpecialEncoding::SLT, -1, 0, 1, false),
+    PARAM(SpecialEncoding::SLT, -1, 1, 1, false),
+    PARAM(SpecialEncoding::SLT,  0,-1, 0, false),
+    PARAM(SpecialEncoding::SLT,  1,-1, 0, false)
 ));
 
 INSTANTIATE_TEST_CASE_P(
-SLTU, ShiftImmediateInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SLTU, 0, 0, 0)
+SLTU, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::SLTU,  0, 0, 0, false),
+    PARAM(SpecialEncoding::SLTU,  1, 1, 0, false),
+    PARAM(SpecialEncoding::SLTU,  0, 1, 1, false),
+    PARAM(SpecialEncoding::SLTU,  1, 0, 0, false),
+    PARAM(SpecialEncoding::SLTU, -1, 0, 0, false),
+    PARAM(SpecialEncoding::SLTU, -1, 1, 0, false),
+    PARAM(SpecialEncoding::SLTU,  0,-1, 1, false),
+    PARAM(SpecialEncoding::SLTU,  1,-1, 1, false)
 ));
-#endif
 
-#if 0
+#if 1
 TEST(InstructionSYSCALL, Test0)
 {
 	FAIL();

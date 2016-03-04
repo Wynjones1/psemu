@@ -2,7 +2,7 @@
 #include "cpu.h"
 #include "memory.h"
 
-#if 0
+#if 1
 
 TEST(InstructionJR, Test0)
 {

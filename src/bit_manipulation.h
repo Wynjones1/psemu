@@ -2,13 +2,13 @@
 #define BIT_MANIPULATION
 #include <type_traits>
 
-inline constexpr uint32_t mask(unsigned int MSB, unsigned int LSB)
+inline constexpr uint64_t mask(unsigned int MSB, unsigned int LSB)
 {
-	return (((uint64_t(1) << (MSB + 1)) - 1) >> LSB) << LSB;
+	return (((uint64_t(-1) >> (63 - MSB))) >> LSB) << LSB;
 }
 
 template<typename T = uint32_t>
-inline constexpr T extract(uint32_t value, unsigned int MSB, unsigned int LSB)
+inline constexpr T extract(T value, unsigned int MSB, unsigned int LSB)
 {
 	return T((value & mask(MSB, LSB)) >> LSB);
 }
@@ -20,6 +20,12 @@ inline void encode(uint32_t &out, uint32_t in, unsigned int msb, unsigned int ls
 	out &= ~value_mask;
 	// Insert the bits.
 	out |= (in << lsb) & value_mask;
+}
+
+template<typename T = uint32_t>
+inline constexpr T sign_bit(T in)
+{
+    return extract(in, 8 * sizeof(T) - 1, 8 * sizeof(T) - 1);
 }
 
 template<typename T0, typename T1 = uint32_t>
@@ -45,7 +51,7 @@ inline T1 sign_extend(T0 in)
 }
 
 template<typename T= int32_t>
-inline auto conv_to_unsigned(const T in) -> typename std::make_unsigned<T>::type
+inline auto to_unsigned(const T in) -> typename std::make_unsigned<T>::type
 {
 	union
 	{
@@ -57,15 +63,15 @@ inline auto conv_to_unsigned(const T in) -> typename std::make_unsigned<T>::type
 }
 
 template<typename T = uint32_t>
-inline auto conv_to_signed(const T in) -> typename std::make_signed<T>::type
+inline auto to_signed(const T in) -> typename std::make_signed<T>::type
 {
 	union
 	{
-		T signed_;
-		typename std::make_signed<T>::type unsigned_;
+		T unsigned_;
+		typename std::make_signed<T>::type signed_;
 	}temp;
-	temp.signed_ = in;
-	return temp.unsigned_;
+	temp.unsigned_ = in;
+	return temp.signed_;
 }
 
 #endif

@@ -3,6 +3,11 @@ include(functions)
 setup_local_gtest()
 
 file(GLOB_RECURSE TESTS *.cpp)
+#set(TESTS
+#    arithmetic_instructions.cpp
+#    bit_manipulation.cpp
+#    misc_instructions.cpp
+#)
 
 foreach(TEST ${TESTS})
     get_filename_component(NAME ${TEST} NAME_WE)

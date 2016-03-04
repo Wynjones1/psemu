@@ -223,9 +223,9 @@ public:
     explicit operator uint32_t() { return value; }
 
 	// Common
-    inline OpcodeEncoding  op() { return extract<OpcodeEncoding>(value, 31, 26);}
-    inline Register        rs() { return extract<Register>(value, 25, 21);}
-    inline Register        rt() { return extract<Register>(value, 20, 16);}
+    inline OpcodeEncoding  op() { return (OpcodeEncoding) extract(value, 31, 26);}
+    inline Register        rs() { return (Register)       extract(value, 25, 21);}
+    inline Register        rt() { return (Register)       extract(value, 20, 16);}
 
 	// Immediate Instruction
     inline uint16_t imm(){ return extract(value, 15, 0);}
@@ -234,9 +234,9 @@ public:
 	inline uint32_t target() { return extract(value, 25, 0); }
 
 	// Register Instruction
-	inline Register        rd()    { return extract<Register>(value, 15, 11); }
-	inline uint8_t         shamt() { return extract(value, 10, 6); }
-	inline SpecialEncoding funct() { return extract<SpecialEncoding>(value, 5, 0); }
+	inline Register        rd()    { return (Register)        extract(value, 15, 11); }
+	inline uint8_t         shamt() { return                   extract(value, 10, 6); }
+	inline SpecialEncoding funct() { return (SpecialEncoding) extract(value, 5, 0); }
 
 
 	inline bool is_special()

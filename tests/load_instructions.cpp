@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "cpu.h"
 #include "memory.h"
-#if 0
+#if 1
 
 
 TEST(InstructionLB, Test0)

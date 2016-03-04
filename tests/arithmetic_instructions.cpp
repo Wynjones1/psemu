@@ -1,6 +1,7 @@
 #include "support.h"
 #include <tuple>
 
+#undef PARAM
 #define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint64_t>
 
 class MultDivInstruction : public InstructionTestFixture<PARAM>{};
@@ -55,8 +56,9 @@ TEST_P(AddSubInstruction, Test)
 	cpu.registers[Register::R2] = std::get<2>(param);
 	cpu.registers[Register::R3] = 0;
 	cpu.ExecuteInstruction(instruction);
+    bool overflow_bit_expected = std::get<4>(param);
+    ASSERT_EQ(cpu.debug_state.has_overflown, overflow_bit_expected);
 	ASSERT_EQ(cpu.registers[Register::R3], std::get<3>(param));
-    ASSERT_EQ(cpu.debug_state.has_overflown, std::get<4>(param));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -94,7 +96,7 @@ ADD_Overflow, AddSubInstruction, ::testing::Values(
 
 INSTANTIATE_TEST_CASE_P(
 SUB_Overflow, AddSubInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SUB, 1,          2, 0, true),
+    PARAM(SpecialEncoding::SUB, INT32_MIN,  2, 0, true),
     PARAM(SpecialEncoding::SUB, INT32_MAX, -1, 0, true),
     PARAM(SpecialEncoding::SUB, INT32_MIN,  1, 0, true)
 ));

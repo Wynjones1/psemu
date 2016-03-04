@@ -171,9 +171,11 @@ public:
 	{
 		DebugState()
 			: has_overflown(false)
+            , divide_by_zero(false)
 		{}
 
 		bool has_overflown;
+        bool divide_by_zero;
 	}debug_state;
 };
 
