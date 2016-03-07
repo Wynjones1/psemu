@@ -1,31 +1,29 @@
 #include "support.h"
 #include "generic_special_instruction.h"
 
-//TEST_P(SpecialInstructionTest, Test)
-
 #undef PARAM
 #define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint32_t, bool>
 
 INSTANTIATE_TEST_CASE_P(
 SLT, SpecialInstructionTest, ::testing::Values(
     PARAM(SpecialEncoding::SLT,  0, 0, 0, false),
-    PARAM(SpecialEncoding::SLT,  1, 1, 0, false),
-    PARAM(SpecialEncoding::SLT,  0, 1, 1, false),
-    PARAM(SpecialEncoding::SLT,  1, 0, 0, false),
-    PARAM(SpecialEncoding::SLT, -1, 0, 1, false),
-    PARAM(SpecialEncoding::SLT, -1, 1, 1, false),
     PARAM(SpecialEncoding::SLT,  0,-1, 0, false),
-    PARAM(SpecialEncoding::SLT,  1,-1, 0, false)
+    PARAM(SpecialEncoding::SLT,  1, 0, 0, false),
+    PARAM(SpecialEncoding::SLT,  1, 1, 0, false),
+    PARAM(SpecialEncoding::SLT,  1,-1, 0, false),
+    PARAM(SpecialEncoding::SLT,  0, 1, 1, false),
+    PARAM(SpecialEncoding::SLT, -1, 0, 1, false),
+    PARAM(SpecialEncoding::SLT, -1, 1, 1, false)
 ));
 
 INSTANTIATE_TEST_CASE_P(
 SLTU, SpecialInstructionTest, ::testing::Values(
     PARAM(SpecialEncoding::SLTU,  0, 0, 0, false),
     PARAM(SpecialEncoding::SLTU,  1, 1, 0, false),
-    PARAM(SpecialEncoding::SLTU,  0, 1, 1, false),
     PARAM(SpecialEncoding::SLTU,  1, 0, 0, false),
     PARAM(SpecialEncoding::SLTU, -1, 0, 0, false),
     PARAM(SpecialEncoding::SLTU, -1, 1, 0, false),
+    PARAM(SpecialEncoding::SLTU,  0, 1, 1, false),
     PARAM(SpecialEncoding::SLTU,  0,-1, 1, false),
     PARAM(SpecialEncoding::SLTU,  1,-1, 1, false)
 ));

@@ -6,8 +6,19 @@ void CPU::ADD(void)
     /* ADD rd, rs, rt
         Add contents of registers rs and rt and place 32 - bit result in
         register rd.Trap on twos complement overflow.*/
-    auto &rs = registers[EX.instruction.rs()];
-    auto &rt = registers[EX.instruction.rt()];
+    auto rs = to_signed(registers[EX.instruction.rs()]);
+    auto rt = to_signed(registers[EX.instruction.rt()]);
+#if HAVE_BUILTIN_OVERFLOW
+    int32_t sum;
+    if(__builtin_add_overflow(rs, rt, &sum))
+    {
+        TriggerOverflowException();
+    }
+    else
+    {
+        registers[EX.instruction.rd()] = sum;
+    }
+#else
     auto sum = rs + rt;
     if (sum < rs)
     {
@@ -17,7 +28,7 @@ void CPU::ADD(void)
     {
         registers[EX.instruction.rd()] = sum;
     }
-    
+#endif
 }
 
 void CPU::ADDU(void)
@@ -37,7 +48,7 @@ void CPU::SUB(void)
         in register rd.Trap on twos complement overflow.*/
     auto rs      = to_signed(registers[EX.instruction.rs()]);
     auto rt      = to_signed(registers[EX.instruction.rt()]);
-#if USE_GCC_BUILTINS
+#if HAVE_BUILTIN_OVERFLOW 
     int32_t res;
     if(__builtin_sub_overflow(rs, rt, &res))
     {

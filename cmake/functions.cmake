@@ -25,3 +25,21 @@ function(list_dir DIR VAR)
 	endforeach()
 	set(${VAR} ${DIRS} PARENT_SCOPE)
 endfunction()
+
+function(run_feature_tests)
+	file(GLOB TEMP ${CMAKE_SOURCE_DIR}/cmake/feature_tests/*.cpp)
+    set(FEATURE_LIST "")
+    foreach(FILE ${TEMP})
+        get_filename_component(NAME ${FILE} NAME_WE)
+        string(TOUPPER HAVE_${NAME} NAME)
+        try_compile(
+            ${NAME} ${CMAKE_BINARY_DIR}/feature_tests
+            SOURCES ${FILE}
+        )
+        if(${${NAME}})
+            set(${NAME} ${${NAME}} PARENT_SCOPE)
+            list(APPEND FEATURE_LIST -D${NAME})
+        endif()
+    endforeach()
+    set(FEATURE_LIST ${FEATURE_LIST} PARENT_SCOPE)
+endfunction()

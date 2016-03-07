@@ -4,6 +4,12 @@ project(PSemu)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(functions)
 setup_cmake_target()
+run_feature_tests()
+
+add_definitions(-fverbose-asm -g)
+
+
+add_definitions(${FEATURE_LIST})
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

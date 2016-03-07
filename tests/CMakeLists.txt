@@ -19,6 +19,7 @@ foreach(TEST ${TESTS})
     target_include_directories(
         ${NAME}
         PUBLIC ${GTEST_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/src)
-    GTEST_ADD_TESTS(${NAME} "" ${TEST})
+    #GTEST_ADD_TESTS(${NAME} "" ${TEST})
+    add_test(NAME ${NAME} COMMAND ${NAME})
 	set_target_properties(${NAME} PROPERTIES FOLDER "Tests")
 endforeach()

@@ -1,6 +1,12 @@
+export CXX=clang++
 all:
 	mkdir -p build
 	cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..
+	cd build && cmake --build . -- -j5
+
+release:
+	mkdir -p build
+	cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
 	cd build && cmake --build . -- -j5
 
 clean:
