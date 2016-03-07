@@ -14,7 +14,7 @@ TEST_P(ShiftImmediateInstruction, Test)
 	cpu.ExecuteInstruction(instruction);
 
     auto result = std::get<3>(param);
-	ASSERT_EQ(cpu.registers[Register::R3], result);
+	ASSERT_EQ(result, cpu.registers[Register::R3]);
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -50,25 +50,25 @@ SRA_MaxShift, ShiftImmediateInstruction, ::testing::Values(
     PARAM(SpecialEncoding::SRA, -1,          31, -1),
     PARAM(SpecialEncoding::SRA,  0,          31,  0),
     PARAM(SpecialEncoding::SRA,  1,          31,  0),
-    PARAM(SpecialEncoding::SRA,  0xefffffff, 31,  0)
+    PARAM(SpecialEncoding::SRA,  INT32_MAX,  31,  0)
 ));
 
 INSTANTIATE_TEST_CASE_P(
 SRL, ShiftImmediateInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SRA,  0, 0,  0),
-    PARAM(SpecialEncoding::SRA,  0, 1,  0),
-    PARAM(SpecialEncoding::SRA,  1, 1,  0),
-    PARAM(SpecialEncoding::SRA, -1, 1, -1),
-    PARAM(SpecialEncoding::SRA, -2, 1, -1),
-    PARAM(SpecialEncoding::SRA,  2, 1,  1),
-    PARAM(SpecialEncoding::SRA,  3, 1,  1),
-    PARAM(SpecialEncoding::SRA,  4, 1,  2)
+    PARAM(SpecialEncoding::SRL,  0, 0,  0),
+    PARAM(SpecialEncoding::SRL,  0, 1,  0),
+    PARAM(SpecialEncoding::SRL,  1, 1,  0),
+    PARAM(SpecialEncoding::SRL, -1, 1, to_unsigned(-1) >> 1),
+    PARAM(SpecialEncoding::SRL, -2, 1, to_unsigned(-2) >> 1),
+    PARAM(SpecialEncoding::SRL,  2, 1,  1),
+    PARAM(SpecialEncoding::SRL,  3, 1,  1),
+    PARAM(SpecialEncoding::SRL,  4, 1,  2)
 ));
 
 INSTANTIATE_TEST_CASE_P(
 SRL_MaxShift, ShiftImmediateInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SRA, -1, 31, 0),
-    PARAM(SpecialEncoding::SRA,  0, 31, 0)
+    PARAM(SpecialEncoding::SRL, -1, 31, 1),
+    PARAM(SpecialEncoding::SRL,  0, 31, 0)
 ));
 
 #include "generic_special_instruction.h"

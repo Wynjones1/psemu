@@ -94,8 +94,8 @@ void CPU::MULT(void)
 	/* MULT rs, rt
 		Multiply contents of registers rs and rt as twos complement
 		values.Place 64 - bit result in special registers HI / LO*/
-    auto rs = to_signed(uint64_t(registers[EX.instruction.rs()]));
-    auto rt = to_signed(uint64_t(registers[EX.instruction.rt()]));
+    int64_t rs = to_signed(registers[EX.instruction.rs()]);
+    int64_t rt = to_signed(registers[EX.instruction.rt()]);
     auto result = rs * rt;
     lo = result & 0xffffffff;
     hi = result >> 32;

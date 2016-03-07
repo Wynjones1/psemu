@@ -2,9 +2,10 @@
 #define BIT_MANIPULATION
 #include <type_traits>
 
-inline constexpr uint64_t mask(unsigned int MSB, unsigned int LSB)
+template<typename T = uint64_t>
+inline constexpr T mask(unsigned int MSB, unsigned int LSB)
 {
-	return (((uint64_t(-1) >> (63 - MSB))) >> LSB) << LSB;
+	return (((T(-1) >> ((sizeof(T) * 8) - MSB - 1))) >> LSB) << LSB;
 }
 
 template<typename T = uint32_t>
@@ -15,7 +16,7 @@ inline constexpr T extract(T value, unsigned int MSB, unsigned int LSB)
 
 inline void encode(uint32_t &out, uint32_t in, unsigned int msb, unsigned int lsb)
 {
-	auto value_mask = mask(msb, lsb);
+	auto value_mask = mask<uint32_t>(msb, lsb);
 	// Mask out the bits we are setting.
 	out &= ~value_mask;
 	// Insert the bits.
@@ -50,7 +51,7 @@ inline T1 sign_extend(T0 in)
 	return temp_out.u;
 }
 
-template<typename T= int32_t>
+template<typename T>
 inline auto to_unsigned(const T in) -> typename std::make_unsigned<T>::type
 {
 	union

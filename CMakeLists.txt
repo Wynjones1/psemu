@@ -6,7 +6,9 @@ include(functions)
 setup_cmake_target()
 run_feature_tests()
 
-add_definitions(-fverbose-asm -g)
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+	add_definitions(-fverbose-asm -g)
+endif()
 
 
 add_definitions(${FEATURE_LIST})

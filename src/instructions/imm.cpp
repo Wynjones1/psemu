@@ -6,8 +6,7 @@ void CPU::ADDI(void)
 	/* ADDI rt, rs, immediate
 		Add 16 - bit sign - extended immediate to register rs and place 32 -
 		bit result in register rt.Trap on twos complement overflow.*/
-	auto &rs = registers[EX.instruction.rs()];
-	auto &rt = registers[EX.instruction.rt()];
+	auto rs = registers[EX.instruction.rs()];
 	auto sum = rs + EX.sign_extended_data;
 	auto rs_neg = extract(rs, 31, 31);
 	auto imm_neg = extract(EX.sign_extended_data, 31, 31);
@@ -20,7 +19,7 @@ void CPU::ADDI(void)
 	}
 	else
 	{
-		rt = sum;
+		registers[EX.instruction.rt()] = sum;
 	}
 }
 
@@ -29,10 +28,9 @@ void CPU::ADDIU(void)
 	/* ADDIU rt, rs, immediate
 		Add 16 - bit sign - extended immediate to register rs and place 32 -
 		bit result in register rt.Do not trap on overflow.*/
-	auto &rs = registers[EX.instruction.rs()];
-	auto &rt = registers[EX.instruction.rt()];
+	auto rs = registers[EX.instruction.rs()];
 	auto sum = rs + EX.sign_extended_data;
-	rt = sum;
+	registers[EX.instruction.rt()] = sum;
 }
 
 void CPU::SLTI(void)

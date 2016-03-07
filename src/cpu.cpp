@@ -46,7 +46,7 @@ void CPU::DecodeInstruction(void)
 
 void CPU::ExecuteInstruction(const Instruction & instruction)
 {
-	auto nop = Instruction(OpcodeEncoding::ADDI, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
+	auto nop = Instruction(OpcodeEncoding::ADDIU, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
 	// Introduce the instruction into the pipeline.
 	IF.instruction = instruction;
 	// Pass the data through the pipeline (minus the instruction fetch.)
