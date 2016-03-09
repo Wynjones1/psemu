@@ -13,3 +13,7 @@ set_property(TARGET psemu PROPERTY CXX_STANDARD 11)
 set_property(TARGET libpsemu PROPERTY CXX_STANDARD 11)
 set_target_properties(psemu PROPERTIES FOLDER "PSemu")
 set_target_properties(libpsemu PROPERTIES FOLDER "PSemu")
+
+if(COVERAGE_ON)
+    target_link_libraries(libpsemu gcov)
+endif()

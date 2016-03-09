@@ -1,4 +1,4 @@
-export CXX=clang++
+#export CXX=clang++-3.8
 all:
 	mkdir -p build
 	cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..

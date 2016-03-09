@@ -1,3 +1,17 @@
+function(cmake_setup)
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+        set(IS_CLANG Yes PARENT_SCOPE)
+    else()
+        set(IS_CLANG No PARENT_SCOPE)
+    endif()
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+        set(IS_GCC Yes PARENT_SCOPE)
+    else()
+        set(IS_GCC No PARENT_SCOPE)
+    endif()
+endfunction()
+
+
 macro(setup_local_gtest)
 	set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/deps/googletest)
 	set(GTEST_LIBRARY gtest)

@@ -3,11 +3,20 @@ project(PSemu)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(functions)
+cmake_setup()
 setup_cmake_target()
 run_feature_tests()
 
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+set(COVERAGE_ON True)
+
+if(IS_CLANG OR IS_GCC)
 	add_definitions(-fverbose-asm -g)
+    if(COVERAGE_ON)
+        add_definitions(--coverage -fprofile-arcs -ftest-coverage)
+        #if(IS_GCC)
+        #    add_definitions(-fprofile-dir=${CMAKE_BINARY_DIR}/coverage)
+        #endif()
+    endif()
 endif()
 
 
