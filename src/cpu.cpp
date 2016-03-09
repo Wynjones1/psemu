@@ -22,7 +22,7 @@ void CPU::Reset()
 	lo = 0;
 
 	// Put nops into the pipeline
-	auto nop = Instruction(OpcodeEncoding::ADDI, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
+	auto nop = Instruction(OpcodeEncoding::NOP, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
 
 	IF.instruction  = nop;
 	ID.instruction  = nop;
@@ -46,7 +46,7 @@ void CPU::DecodeInstruction(void)
 
 void CPU::ExecuteInstruction(const Instruction & instruction)
 {
-	auto nop = Instruction(OpcodeEncoding::ADDIU, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
+	auto nop = Instruction(OpcodeEncoding::NOP, Register::ZERO, Register::ZERO, Register::ZERO, 0, SpecialEncoding::ADD);
 	// Introduce the instruction into the pipeline.
 	IF.instruction = instruction;
 	// Pass the data through the pipeline (minus the instruction fetch.)
@@ -126,6 +126,7 @@ void CPU::Execute(void)
 {
 	auto op = EX.instruction.op();
 	MEM.instruction = EX.instruction;
+
 	if (is_special(op))
 	{
 		MEM.alu_out = ExecuteSpecial();

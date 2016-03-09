@@ -1,6 +1,5 @@
 #ifndef GENERIC_SPECIAL_INSTRUCTION
 #define GENERIC_SPECIAL_INSTRUCTION
-
 #undef PARAM
 #define PARAM std::tuple<SpecialEncoding, uint32_t, uint32_t, uint32_t, bool>
 class SpecialInstructionTest : public InstructionTestFixture<PARAM>{};

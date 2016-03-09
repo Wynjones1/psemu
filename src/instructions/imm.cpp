@@ -7,9 +7,10 @@ void CPU::ADDI(void)
 		Add 16 - bit sign - extended immediate to register rs and place 32 -
 		bit result in register rt.Trap on twos complement overflow.*/
 	auto rs = registers[EX.instruction.rs()];
-	auto sum = rs + EX.sign_extended_data;
+	auto &imm = EX.sign_extended_data;
+	auto sum = rs + imm;
 	auto rs_neg = extract(rs, 31, 31);
-	auto imm_neg = extract(EX.sign_extended_data, 31, 31);
+	auto imm_neg = extract(imm, 31, 31);
 	auto sum_neg = extract(sum, 31, 31);
 
 	if ((rs_neg && imm_neg && !sum_neg) || // Negative overflow.
@@ -58,7 +59,9 @@ void CPU::ANDI(void)
 	/* ANDI rt, rs, immediate
 		Zero - extend 16 - bit immediate, AND with contents of register rs
 		and place result in register rt.*/
-	TODO("Implement");
+	auto rs  = registers[EX.instruction.rs()];
+	auto imm = EX.instruction.imm();
+	registers[EX.instruction.rt()] = rs & imm;
 }
 
 void CPU::ORI(void)
@@ -66,7 +69,9 @@ void CPU::ORI(void)
 	/* ORI rt, rs, immediate
 		Zero - extend 16 - bit immediate, OR with contents of register rs
 		and place result in register rt.*/
-	TODO("Implement");
+	auto rs = registers[EX.instruction.rs()];
+	auto imm = EX.instruction.imm();
+	registers[EX.instruction.rt()] = rs | imm;
 }
 
 void CPU::XORI(void)
@@ -74,7 +79,9 @@ void CPU::XORI(void)
 	/* XORI rt, rs, immediate
 		Zero - extend 16 - bit immediate, exclusive OR with contents of
 		register rs and place result in register rt.*/
-	TODO("Implement");
+	auto rs = registers[EX.instruction.rs()];
+	auto imm = EX.instruction.imm();
+	registers[EX.instruction.rt()] = rs ^ imm;
 }
 
 void CPU::LUI(void)
@@ -82,5 +89,6 @@ void CPU::LUI(void)
 	/* LUI rt, immediate
 		Shift 16 - bit immediate left 16 bits.Set least significant 16 bits
 		of word to zeroes.Store result in register rt.*/
-	TODO("Implement");
+	auto imm = EX.instruction.imm();
+	registers[EX.instruction.rt()] = imm << 16;
 }

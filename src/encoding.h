@@ -45,6 +45,7 @@ enum class OpcodeEncoding : uint8_t
 	SWC1,
 	SWC2,
 	SWC3,
+	NOP, /* This is not actually an instruction in the ISA. */
 };
 
 inline bool is_special(OpcodeEncoding encoding)

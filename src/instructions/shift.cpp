@@ -56,7 +56,7 @@ void CPU::SRLV(void)
 		specify number of bits to shift.Insert zeroes into high order bits
 		of rt and place 32 - bit result in register rd.*/
 	auto rt = registers[EX.instruction.rt()];
-	auto rs = registers[EX.instruction.rs()] & mask(4, 0);
+	auto rs = registers[EX.instruction.rs()] & mask<uint32_t>(4, 0);
 	registers[EX.instruction.rd()] = rt >> rs;
 }
 
@@ -67,7 +67,7 @@ void CPU::SRAV(void)
 		specify number of bits to shift.Sign - extend the high order bits
 		of rt and place 32 - bit result in register rd.*/
 	auto rt = registers[EX.instruction.rt()];
-	auto rs = registers[EX.instruction.rs()] & mask(4, 0);
+	auto rs = registers[EX.instruction.rs()] & mask<uint32_t>(4, 0);
 	auto out = rt >> rs;
 	auto sign_bit = extract(rt, 31, 31);
 	if (sign_bit && rs) // sign extend.
