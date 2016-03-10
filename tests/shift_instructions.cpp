@@ -72,33 +72,39 @@ SRL_MaxShift, ShiftImmediateInstruction, ::testing::Values(
 ));
 
 #include "generic_special_instruction.h"
-class ShiftRegisterInstruction: public SpecialInstructionTest{};
-
-/* TEST_P(ShiftRegisterInstruction, Test) */
-/* TEST_P(SpecialInstructionTest,   Test) */
 
 INSTANTIATE_TEST_CASE_P(
-SLLV, ShiftRegisterInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SLLV, 0x0, 0,  0x00, false),
-    PARAM(SpecialEncoding::SLLV, 0x1, 0,  0x01, false),
-    PARAM(SpecialEncoding::SLLV, 0x1, 1,  0x02, false),
-    PARAM(SpecialEncoding::SLLV, 0x1, 2,  0x04, false),
-    PARAM(SpecialEncoding::SLLV, 0xf, 4,  0xf0, false)
+SLLV, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::SLLV, 0, 0x0, 0x00, false),
+    PARAM(SpecialEncoding::SLLV, 0, 0x1, 0x01, false),
+    PARAM(SpecialEncoding::SLLV, 1, 0x1, 0x02, false),
+    PARAM(SpecialEncoding::SLLV, 2, 0x1, 0x04, false),
+    PARAM(SpecialEncoding::SLLV, 4, 0xf, 0xf0, false)
 ));
 
 INSTANTIATE_TEST_CASE_P(
-SLLV_MaxShift, ShiftRegisterInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SLLV, 0x1, 31, 1 << 31, false),
-    PARAM(SpecialEncoding::SLLV, -1,  31, 1 << 31, false)
+SLLV_MaxShift, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::SLLV, 31, 0x1, 1 << 31, false),
+    PARAM(SpecialEncoding::SLLV, 31, -1,  1 << 31, false)
 ));
 
 
 INSTANTIATE_TEST_CASE_P(
-SRAV, ShiftRegisterInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SRAV, 0, 0, 0, false)
+SRAV, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::SRAV, 0,  0,          0,          false),
+    PARAM(SpecialEncoding::SRAV, 1,  0x80000000, 0xc0000000, false),
+    PARAM(SpecialEncoding::SRAV, 1,  0xffffffff, 0xffffffff, false),
+    PARAM(SpecialEncoding::SRAV, 4,  0x0fffffff, 0x00ffffff, false),
+    PARAM(SpecialEncoding::SRAV, 32, 0x0fffffff, 0x0fffffff, false),
+    PARAM(SpecialEncoding::SRAV, 36, 0x0fffffff, 0x00ffffff, false)
 ));
 
 INSTANTIATE_TEST_CASE_P(
-SRLV, ShiftRegisterInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::SRLV, 0, 0, 0, false)
+SRLV, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::SRLV, 0,  0,          0,          false),
+    PARAM(SpecialEncoding::SRLV, 1,  0x80000000, 0x40000000, false),
+    PARAM(SpecialEncoding::SRLV, 1,  0xffffffff, 0x7fffffff, false),
+    PARAM(SpecialEncoding::SRLV, 4,  0x0fffffff, 0x00ffffff, false),
+    PARAM(SpecialEncoding::SRLV, 32, 0x0fffffff, 0x0fffffff, false),
+    PARAM(SpecialEncoding::SRLV, 36, 0x0fffffff, 0x00ffffff, false)
 ));

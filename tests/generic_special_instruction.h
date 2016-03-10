@@ -14,8 +14,8 @@ TEST_P(SpecialInstructionTest, Test)
 	cpu.registers[Register::R3] = 0;
 	cpu.ExecuteInstruction(instruction);
     bool overflow_bit_expected = std::get<4>(param);
-    ASSERT_EQ(cpu.debug_state.has_overflown, overflow_bit_expected);
-	ASSERT_EQ(cpu.registers[Register::R3], std::get<3>(param));
+    ASSERT_EQ(overflow_bit_expected, cpu.debug_state.has_overflown);
+	ASSERT_EQ(std::get<3>(param), cpu.registers[Register::R3]);
 }
 
 #endif

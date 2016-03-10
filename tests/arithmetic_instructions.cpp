@@ -76,25 +76,29 @@ DIVU, DivInstructionTest, ::testing::Values(
 ));
 
 #include "generic_special_instruction.h"
-class AddSubInstruction : public SpecialInstructionTest {};
 
 INSTANTIATE_TEST_CASE_P(
-ADD, AddSubInstruction, ::testing::Values(
+ADD, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::ADD, -1, 0, -1, false),
+    PARAM(SpecialEncoding::ADD, -1, 1, 0, false),
+    PARAM(SpecialEncoding::ADD, 1, -1, 0, false),
+    PARAM(SpecialEncoding::ADD, -1, -1, -2, false),
     PARAM(SpecialEncoding::ADD, 0, 0, 0, false),
     PARAM(SpecialEncoding::ADD, 1, 1, 2, false)
 ));
 
 INSTANTIATE_TEST_CASE_P(
-ADDU, AddSubInstruction, ::testing::Values(
+ADDU, SpecialInstructionTest, ::testing::Values(
     PARAM(SpecialEncoding::ADDU, 0,          0, 0, false),
     PARAM(SpecialEncoding::ADDU, 1,          0, 1, false),
     PARAM(SpecialEncoding::ADDU, 1,          1, 2, false),
     PARAM(SpecialEncoding::ADDU, UINT32_MAX, 1, 0, false),
-    PARAM(SpecialEncoding::ADDU, 1, UINT32_MAX, 0, false)
+    PARAM(SpecialEncoding::ADDU, 1, UINT32_MAX, 0, false),
+    PARAM(SpecialEncoding::ADDU, UINT32_MAX, UINT32_MAX, UINT32_MAX - 1, false)
 ));
 
 INSTANTIATE_TEST_CASE_P(
-SUB, AddSubInstruction, ::testing::Values(
+SUB, SpecialInstructionTest, ::testing::Values(
     PARAM(SpecialEncoding::SUB,  0, 0, 0,  false),
     PARAM(SpecialEncoding::SUB,  1, 1, 0,  false),
     PARAM(SpecialEncoding::SUBU, 1, 2, -1, false),
@@ -102,7 +106,7 @@ SUB, AddSubInstruction, ::testing::Values(
 ));
 
 INSTANTIATE_TEST_CASE_P(
-SUBU, AddSubInstruction, ::testing::Values(
+SUBU, SpecialInstructionTest, ::testing::Values(
     PARAM(SpecialEncoding::SUBU, 0, 0,  0, false),
     PARAM(SpecialEncoding::SUBU, 1, 1,  0, false),
     PARAM(SpecialEncoding::SUBU, 1, 2, -1, false),
@@ -110,13 +114,15 @@ SUBU, AddSubInstruction, ::testing::Values(
 ));
 
 INSTANTIATE_TEST_CASE_P(
-ADD_Overflow, AddSubInstruction, ::testing::Values(
-    PARAM(SpecialEncoding::ADD, 1, UINT32_MAX, 0, true),
-    PARAM(SpecialEncoding::ADD, UINT32_MAX, 1, 0, true)
+ADD_Overflow, SpecialInstructionTest, ::testing::Values(
+    PARAM(SpecialEncoding::ADD, 1, INT32_MAX,  0, true),
+    PARAM(SpecialEncoding::ADD, INT32_MAX, 1,  0, true),
+    PARAM(SpecialEncoding::ADD, -1, INT32_MIN, 0, true),
+    PARAM(SpecialEncoding::ADD, INT32_MIN, -1, 0, true)
 ));
 
 INSTANTIATE_TEST_CASE_P(
-SUB_Overflow, AddSubInstruction, ::testing::Values(
+SUB_Overflow, SpecialInstructionTest, ::testing::Values(
     PARAM(SpecialEncoding::SUB, INT32_MIN,  2, 0, true),
     PARAM(SpecialEncoding::SUB, INT32_MAX, -1, 0, true),
     PARAM(SpecialEncoding::SUB, INT32_MIN,  1, 0, true)

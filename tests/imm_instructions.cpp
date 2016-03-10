@@ -89,3 +89,26 @@ INSTANTIATE_TEST_CASE_P(
 		PARAM(OpcodeEncoding::LUI, 1, 0x1, 0x1 << 16, false),
 		PARAM(OpcodeEncoding::LUI, -1, 0x1, 0x1 << 16, false)
 ));
+
+INSTANTIATE_TEST_CASE_P(
+    SLTI, ImmediateInstruction, ::testing::Values(
+    PARAM(OpcodeEncoding::SLTI, -1,  0, 1, false),
+    PARAM(OpcodeEncoding::SLTI, -2, -1, 1, false),
+    PARAM(OpcodeEncoding::SLTI,  0,  1, 1, false),
+    PARAM(OpcodeEncoding::SLTI,  1,  2, 1, false),
+    PARAM(OpcodeEncoding::SLTI,  INT32_MIN,  INT16_MIN, 1, false),
+    PARAM(OpcodeEncoding::SLTI, -1, -1, 0, false),
+    PARAM(OpcodeEncoding::SLTI, -1, -2, 0, false),
+    PARAM(OpcodeEncoding::SLTI,  1,  0, 0, false),
+    PARAM(OpcodeEncoding::SLTI,  0,  0, 0, false),
+    PARAM(OpcodeEncoding::SLTI,  2,  1, 0, false)
+));
+
+INSTANTIATE_TEST_CASE_P(
+    SLTIU, ImmediateInstruction, ::testing::Values(
+    PARAM(OpcodeEncoding::SLTIU,  0,  1,          1, false),
+    PARAM(OpcodeEncoding::SLTIU,  1,  2,          1, false),
+    PARAM(OpcodeEncoding::SLTIU,  0,  UINT32_MAX, 1, false),
+    PARAM(OpcodeEncoding::SLTIU,  1,  0,          0, false),
+    PARAM(OpcodeEncoding::SLTIU,  2,  1,          0, false)
+));

@@ -41,7 +41,16 @@ void CPU::SLTI(void)
 		signed 32 - bit integers.Result = 1 if rs is less than immediate;
 		otherwise result = 0.
 		Place result in register rt.*/
-	TODO("Implement");
+	auto rs   = to_signed(registers[EX.instruction.rs()]);
+	auto data = to_signed(EX.sign_extended_data);
+    if(rs < data)
+    {
+        registers[EX.instruction.rt()] = 1;
+    }
+    else
+    {
+        registers[EX.instruction.rt()] = 0;
+    }
 }
 
 void CPU::SLTIU(void)
@@ -51,7 +60,16 @@ void CPU::SLTIU(void)
 		unsigned 32 - bit integers.Result = 1 if rs is less than immediate;
 		otherwise result = 0. Place result in register rt.Do not trap on
 		overflow.*/
-	TODO("Implement");
+	auto rs   = registers[EX.instruction.rs()];
+	auto data = EX.sign_extended_data;
+    if(rs < data)
+    {
+        registers[EX.instruction.rt()] = 1;
+    }
+    else
+    {
+        registers[EX.instruction.rt()] = 0;
+    }
 }
 
 void CPU::ANDI(void)
