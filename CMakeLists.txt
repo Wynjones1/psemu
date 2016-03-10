@@ -7,7 +7,7 @@ cmake_setup()
 setup_cmake_target()
 run_feature_tests()
 
-set(COVERAGE_ON True)
+option(COVERAGE_ON "Enable code coverage (if available)" True)
 
 if(IS_CLANG OR IS_GCC)
 	add_definitions(-fverbose-asm -g)
